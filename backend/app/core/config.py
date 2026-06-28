@@ -25,7 +25,8 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 30  # 30 days
 
     # --- CORS ---
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: str = "http://localhost:3000"
+
 
     # --- Database ---
     DATABASE_URL: str = (
