@@ -35,8 +35,12 @@ class Settings(BaseSettings):
 
     # --- AI Provider (Google AI Studio / Gemini) ---
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.0-flash"
+    GEMINI_MODEL: str = "gemini-2.5-flash"
     GEMINI_API_BASE: str = "https://generativelanguage.googleapis.com/v1beta"
+    # --- Gemini Live API (real-time voice) ---
+    GEMINI_LIVE_MODEL: str = "models/gemini-live-2.5-flash-native-audio"
+    FREE_PLAN_DAILY_VOICE_SECONDS: int = 300   # 5 minutes for free users
+
 
     # --- Subscription limits ---
     FREE_PLAN_DAILY_MESSAGES: int = 10

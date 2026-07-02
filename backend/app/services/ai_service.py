@@ -90,6 +90,7 @@ async def generate_legal_response(
         "generationConfig": {
             "temperature": 0.4,
             "maxOutputTokens": 1024,
+            "thinkingConfig": {"thinkingBudget": 0},
         },
     }
 
@@ -128,7 +129,7 @@ Respond ONLY with valid JSON, no markdown fences, in this exact shape:
     body = {
         "contents": [{"role": "user", "parts": [{"text": text}]}],
         "systemInstruction": {"parts": [{"text": system_prompt}]},
-        "generationConfig": {"temperature": 0.2, "maxOutputTokens": 512},
+        "generationConfig": {"temperature": 0.2, "maxOutputTokens": 512, "thinkingConfig": {"thinkingBudget": 0}},
     }
     if not settings.GEMINI_API_KEY:
         raise AIServiceError("AI service is not configured. Set GEMINI_API_KEY in the backend .env file.")

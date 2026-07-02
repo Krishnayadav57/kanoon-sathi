@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.v1 import (
+    voice,
     admin,
     auth,
     chat,
@@ -32,3 +33,4 @@ api_router.include_router(offices.router)
 api_router.include_router(lawyers.router)
 api_router.include_router(compliance.router)
 api_router.include_router(admin.router)
+api_router.include_router(voice.router)

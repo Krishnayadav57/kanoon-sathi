@@ -228,7 +228,6 @@ LAWYERS = [
 
 
 def seed():
-    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         if db.query(LegalCategory).count() == 0:

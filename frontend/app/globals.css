@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --font-fraunces: "Fraunces", Georgia, serif;
+  --font-display: "Lexend", system-ui, sans-serif;
   --font-inter: "Inter", system-ui, sans-serif;
   --font-jbmono: "JetBrains Mono", monospace;
 }
@@ -13,8 +13,8 @@ html {
 }
 
 body {
-  background-color: #FDFBF7;
-  color: #1C2B33;
+  background-color: #FAFAF8;
+  color: #13151A;
 }
 
 /* Senior accessibility mode: larger base font, more line-height */
@@ -25,7 +25,7 @@ body.senior-mode {
 
 /* Visible keyboard focus ring everywhere */
 :focus-visible {
-  outline: 2px solid #8B1E2B;
+  outline: 2px solid #A8232F;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -43,11 +43,56 @@ body.senior-mode {
   width: 6px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: #E7E9EB;
+  background-color: #E8E8E6;
   border-radius: 999px;
 }
 
 /* Devanagari rendering tweak for body text density */
 [lang="ne"], .lang-ne {
   letter-spacing: 0.01em;
+}
+
+/*
+  Signature element: "verified document" scan-trace border.
+  A thin animated gradient line traces the card's edge on hover, evoking a
+  document being scanned/verified — the one bold motion idea on the page,
+  used consistently across interactive cards so it reads as a system, not
+  decoration. Respects prefers-reduced-motion via the rule above.
+*/
+.scan-trace-border {
+  position: relative;
+  isolation: isolate;
+}
+.scan-trace-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 40%,
+    #A8232F 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 250% 100%;
+  background-position: -100% 0%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.scan-trace-border:hover::before {
+  opacity: 1;
+  animation: scan-trace 1.8s linear infinite;
+}
+
+/* Staggered fade-up reveal helper — apply with style delay via inline style or nth-child in component */
+.reveal {
+  animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

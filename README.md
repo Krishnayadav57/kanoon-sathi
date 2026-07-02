@@ -57,13 +57,24 @@ fixing it there improves both the library and the chat.
 ### Backend
 ```bash
 cd backend
-python3 -m venv venv && source venv/bin/activate
+python -m venv venv
+# On Windows: venv\Scripts\activate  |  On macOS/Linux: source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # then fill in real values
+
 # For local dev, swap DATABASE_URL in .env to: sqlite:///./dev.db
 alembic upgrade head    # or just run the app once — seed_data also creates tables
 python -m app.seed.seed_data
+# Manually copy .env.example to .env and fill in the values.
+# For local dev, set DATABASE_URL in .env to: sqlite:///./dev.db
+# After editing .env, run the following:
+
+alembic upgrade head          # Create/update database tables
+python -m app.seed.seed_data  # Seed the database with initial content
 uvicorn app.main:app --reload
+# For local dev, you can set DATABASE_URL in .env to: sqlite:///./dev.db
+python run.py seed            # Create DB tables and seed initial data
+python run.py                 # Start the development server
 ```
 API docs: http://localhost:8000/docs
 
@@ -136,6 +147,3 @@ kanoon-mitra/
 ```
 See `backend/app/api/v1/` for all API routes, `backend/app/models/` for the
 full DB schema, and `frontend/app/` for every page.
-
-
-

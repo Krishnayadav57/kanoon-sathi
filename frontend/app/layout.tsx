@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
+import { Lexend, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { LangProvider } from "@/lib/lang-context";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const fraunces = Fraunces({
+const display = Lexend({
   subsets: ["latin"],
-  variable: "--font-fraunces",
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+  weight: ["500", "600", "700"],
   display: "swap",
 });
 
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ne">
-      <body className={`${fraunces.variable} ${inter.variable} ${jbmono.variable} font-body antialiased`}>
+      <body className={`${display.variable} ${inter.variable} ${jbmono.variable} font-body antialiased bg-paper text-ink`}>
         <LangProvider>
           <AuthProvider>
             <div className="flex min-h-screen flex-col">

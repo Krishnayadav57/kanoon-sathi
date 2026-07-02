@@ -139,3 +139,20 @@ class ScamCheck(Base):
     risk_level: Mapped[str] = mapped_column(String(20), default="unknown")  # low|medium|high
     explanation: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+# ---------- Real-time Voice Assistant usage tracking ----------
+
+class VoiceUsage(Base):
+    """
+    One row per user per UTC calendar day, tracking cumulative voice seconds used.
+    Enforces the free-plan daily cap (FREE_PLAN_DAILY_VOICE_SECONDS in config).
+    Premium users are never blocked but their usage is still logged here.
+    """
+    __tablename__ = "voice_usage"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    usage_date: Mapped[str] = mapped_column(String(10), nullable=False)   # "YYYY-MM-DD" UTC
+    seconds_used: Mapped[int] = mapped_column(Integer, default=0)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

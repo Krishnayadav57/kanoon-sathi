@@ -7,6 +7,12 @@ from app.core.config import settings
 from app.db.session import Base
 from app.models import *  # noqa: F401,F403 - ensures all models are registered on Base.metadata
 
+# Import all models here so that Base.metadata is populated
+from app.models.user import User  # noqa: F401
+from app.models.payment import Payment  # noqa: F401
+from app.models.knowledge_base import LegalArticle, LegalCategory  # noqa: F401
+from app.models.extras import LawyerProfile, OfficeLocation, Quiz, VoiceUsage, ComplianceReminder  # noqa: F401
+
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 

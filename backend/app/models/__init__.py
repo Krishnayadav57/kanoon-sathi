@@ -6,6 +6,7 @@ from app.models.chat import ChatMessage, ChatSession
 from app.models.complaint import Complaint, ComplaintType
 from app.models.document import LegalDocument, DocumentStatus
 from app.models.extras import (
+    VoiceUsage,
     Advertisement,
     Badge,
     ComplianceReminder,
@@ -48,4 +49,5 @@ __all__ = [
     "ConsultationBooking",
     "ComplianceReminder",
     "ScamCheck",
+    "VoiceUsage",
 ]
