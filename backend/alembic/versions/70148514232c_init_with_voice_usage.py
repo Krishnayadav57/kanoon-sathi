@@ -1,6 +1,6 @@
 """init_with_voice_usage
 
-Revision ID: 70148514232c
+Revision ID: 70148514232c,4a536e203a04
 Revises: 
 Create Date: 2026-07-02 11:16:50.226730
 
@@ -11,7 +11,7 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision: str = '70148514232c'
+revision: str = '4a536e203a04'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
