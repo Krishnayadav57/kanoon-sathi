@@ -7,6 +7,8 @@ import { Menu, X, Scale, ChevronDown } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useLang } from "@/lib/lang-context";
 
+import Image from "next/image";
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { lang, setLang, t } = useLang();
@@ -43,10 +45,22 @@ export default function Navbar() {
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
+
         <Link href="/" className="group flex shrink-0 items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink text-paper shadow-soft transition-all duration-300 ease-smooth group-hover:bg-crimson-600">
+
+          {/* <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink text-paper shadow-soft transition-all duration-300 ease-smooth group-hover:bg-crimson-600">
             <Scale size={17} strokeWidth={2.5} />
-          </span>
+          </span> */}
+
+          <Image
+  src="/logo.png"
+  alt="Kanoon Mitra"
+  width={36}
+  height={36}
+  className="rounded-xl shadow-soft"
+/>
+
+          
           <span className="font-display text-[17px] font-semibold tracking-tight text-ink">
             {lang === "ne" ? "कानून मित्र" : "Kanoon Mitra"}
           </span>
