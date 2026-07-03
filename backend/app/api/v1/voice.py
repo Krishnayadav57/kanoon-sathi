@@ -11,6 +11,7 @@ Language defaults to Nepali as requested.
 """
 import asyncio
 import json
+import logging
 from datetime import datetime, timezone
 
 import websockets
@@ -24,6 +25,8 @@ from app.db.session import SessionLocal
 from app.models.user import SubscriptionPlan, User
 
 router = APIRouter(tags=["Voice Assistant"])
+
+logger = logging.getLogger("voice")
 
 SYSTEM_INSTRUCTION_NE = (
     "तपाईं कानून मित्र हुनुहुन्छ — नेपालको कानूनी जागरूकता भ्वाइस सहायक। "
@@ -82,7 +85,17 @@ def _get_or_create_voice_usage(db: Session, user_id: str):
             db.refresh(row)
         return row
     except Exception:
+        logger.exception("Could not load/create VoiceUsage row")
         return None  # graceful degradation if VoiceUsage table not yet migrated
+
+
+async def _safe_send_json(websocket: WebSocket, payload: dict) -> None:
+    """Send only if the client socket is still open; never raise."""
+    try:
+        if websocket.client_state.name == "CONNECTED":
+            await websocket.send_json(payload)
+    except Exception:
+        pass
 
 
 @router.websocket("/ws/voice")
@@ -92,6 +105,8 @@ async def voice_ws(
     language: str = Query(default="ne"),
 ):
     db = SessionLocal()
+    usage_row = None
+    session_start = None
     try:
         user = _get_user_from_token(db, token)
         if user is None or not user.is_active:
@@ -106,7 +121,7 @@ async def voice_ws(
             limit = getattr(settings, "FREE_PLAN_DAILY_VOICE_SECONDS", 300)
             if usage_row.seconds_used >= limit:
                 await websocket.accept()
-                await websocket.send_json({
+                await _safe_send_json(websocket, {
                     "type": "limit_reached",
                     "message": (
                         "तपाईंले आजको ५ मिनेट नि:शुल्क भ्वाइस समय सकाउनुभयो। "
@@ -121,7 +136,7 @@ async def voice_ws(
 
         if not settings.GEMINI_API_KEY:
             await websocket.accept()
-            await websocket.send_json({
+            await _safe_send_json(websocket, {
                 "type": "error",
                 "message": "Voice assistant not configured (missing GEMINI_API_KEY).",
             })
@@ -136,7 +151,7 @@ async def voice_ws(
             limit = getattr(settings, "FREE_PLAN_DAILY_VOICE_SECONDS", 300)
             remaining = max(0, limit - usage_row.seconds_used)
 
-        await websocket.send_json({"type": "ready", "remaining_seconds": remaining})
+        await _safe_send_json(websocket, {"type": "ready", "remaining_seconds": remaining})
 
         # Build Gemini Live URL
         live_model = getattr(settings, "GEMINI_LIVE_MODEL", "models/gemini-live-2.5-flash-native-audio")
@@ -148,8 +163,19 @@ async def voice_ws(
 
         system_instruction = SYSTEM_INSTRUCTION_NE if language == "ne" else SYSTEM_INSTRUCTION_EN
 
+        # session_start must be set BEFORE we attempt the Gemini connection so
+        # that even a connection that fails instantly still logs elapsed time
+        # (usually ~0s) and, more importantly, so the finally block below can
+        # always compute a valid elapsed duration no matter where we fail.
+        session_start = asyncio.get_event_loop().time()
+
         try:
-            async with websockets.connect(gemini_url, max_size=None) as gemini_ws:
+            async with websockets.connect(
+                gemini_url,
+                max_size=None,
+                open_timeout=15,
+                close_timeout=5,
+            ) as gemini_ws:
                 # Send setup message
                 await gemini_ws.send(json.dumps({
                     "setup": {
@@ -166,7 +192,21 @@ async def voice_ws(
                     }
                 }))
 
-                session_start = asyncio.get_event_loop().time()
+                # Wait for Gemini's setupComplete acknowledgement (or an error)
+                # before declaring the call "active". This surfaces bad model
+                # names / auth issues as a clear error instead of an instant,
+                # silent disconnect.
+                try:
+                    first_msg = await asyncio.wait_for(gemini_ws.recv(), timeout=10)
+                    parsed_first = json.loads(first_msg) if isinstance(first_msg, (str, bytes)) else {}
+                    if isinstance(parsed_first, dict) and "error" in parsed_first:
+                        raise RuntimeError(f"Gemini Live setup rejected: {parsed_first['error']}")
+                except asyncio.TimeoutError:
+                    raise RuntimeError(
+                        "Timed out waiting for Gemini Live to acknowledge setup. "
+                        "Check GEMINI_LIVE_MODEL and that your API key has Live API access."
+                    )
+
                 stop_event = asyncio.Event()
 
                 async def time_limit_watcher():
@@ -176,17 +216,14 @@ async def voice_ws(
                     while not stop_event.is_set():
                         elapsed = asyncio.get_event_loop().time() - session_start
                         if elapsed >= remaining:
-                            try:
-                                await websocket.send_json({
-                                    "type": "limit_reached",
-                                    "message": (
-                                        "तपाईंको नि:शुल्क भ्वाइस समय सकियो। प्रिमियममा अपग्रेड गर्नुहोस्।"
-                                        if language == "ne" else
-                                        "Your free voice time has ended. Upgrade to Premium."
-                                    ),
-                                })
-                            except Exception:
-                                pass
+                            await _safe_send_json(websocket, {
+                                "type": "limit_reached",
+                                "message": (
+                                    "तपाईंको नि:शुल्क भ्वाइस समय सकियो। प्रिमियममा अपग्रेड गर्नुहोस्।"
+                                    if language == "ne" else
+                                    "Your free voice time has ended. Upgrade to Premium."
+                                ),
+                            })
                             stop_event.set()
                             break
                         await asyncio.sleep(1)
@@ -203,6 +240,10 @@ async def voice_ws(
 
                 async def gemini_to_browser():
                     try:
+                        # Replay the first message we already consumed above
+                        await websocket.send_text(
+                            first_msg if isinstance(first_msg, str) else first_msg.decode("utf-8", errors="ignore")
+                        )
                         while not stop_event.is_set():
                             msg = await gemini_ws.recv()
                             text = msg if isinstance(msg, str) else msg.decode("utf-8", errors="ignore")
@@ -222,27 +263,29 @@ async def voice_ws(
                     t.cancel()
                 await asyncio.gather(*tasks, return_exceptions=True)
 
-                # Log usage
-                elapsed_s = int(asyncio.get_event_loop().time() - session_start)
-                if usage_row is not None:
-                    usage_row.seconds_used += max(0, elapsed_s)
-                    db.add(usage_row)
-                    db.commit()
-
         except Exception as e:
-            try:
-                await websocket.send_json({"type": "error", "message": f"Voice session error: {e}"})
-            except Exception:
-                pass
+            logger.exception("Voice session error")
+            await _safe_send_json(websocket, {"type": "error", "message": f"Voice session error: {e}"})
 
     except WebSocketDisconnect:
         pass
     except Exception as e:
-        try:
-            await websocket.send_json({"type": "error", "message": str(e)})
-        except Exception:
-            pass
+        logger.exception("Unhandled voice_ws error")
+        await _safe_send_json(websocket, {"type": "error", "message": str(e)})
     finally:
+        # ALWAYS persist elapsed usage, regardless of how/where the session
+        # ended (clean close, exception, disconnect). This is the fix for
+        # "5-minute limit resets on refresh" — previously this only ran when
+        # the Gemini `async with` block exited normally.
+        try:
+            if usage_row is not None and session_start is not None:
+                elapsed_s = int(asyncio.get_event_loop().time() - session_start)
+                if elapsed_s > 0:
+                    usage_row.seconds_used += elapsed_s
+                    db.add(usage_row)
+                    db.commit()
+        except Exception:
+            logger.exception("Failed to persist voice usage")
         db.close()
         try:
             await websocket.close()
