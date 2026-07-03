@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useLang } from "@/lib/lang-context";
-import { Scale, AlertTriangle } from "lucide-react";
+// import { Scale, AlertTriangle } from "lucide-react";
+import Image from "next/image";
+import { AlertTriangle } from "lucide-react";
 
 export default function Footer() {
   const { lang, t } = useLang();
@@ -60,14 +62,30 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-4">
           {/* Brand */}
           <div className="sm:col-span-1">
-            <Link href="/" className="group flex items-center gap-2.5">
+            {/* <Link href="/" className="group flex items-center gap-2.5">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink text-paper">
                 <Scale size={17} strokeWidth={2.5} />
               </span>
               <span className="font-display text-base font-semibold text-ink">
                 {lang === "ne" ? "कानून मित्र" : "Kanoon Mitra"}
               </span>
-            </Link>
+            </Link> */}
+
+            <Link href="/" className="group flex items-center gap-2.5">
+  <Image
+    src="/logo.png"
+    alt="Kanoon Mitra"
+    width={36}
+    height={36}
+    className="rounded-xl"
+  />
+
+  <span className="font-display text-base font-semibold text-ink">
+    {lang === "ne" ? "कानून मित्र" : "Kanoon Mitra"}
+  </span>
+</Link>
+
+
             <p className="lang-ne mt-3 text-sm leading-relaxed text-slate-500">{t("tagline")}</p>
           </div>
 
