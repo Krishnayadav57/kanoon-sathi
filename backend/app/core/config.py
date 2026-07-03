@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-2.5-flash"
     GEMINI_API_BASE: str = "https://generativelanguage.googleapis.com/v1beta"
     # --- Gemini Live API (real-time voice) ---
-    GEMINI_LIVE_MODEL: str = "models/gemini-live-2.5-flash-native-audio"
+    GEMINI_LIVE_MODEL: str = "models/gemini-2.0-flash-live-001"
     FREE_PLAN_DAILY_VOICE_SECONDS: int = 300   # 5 minutes for free users
 
 
