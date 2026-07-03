@@ -155,7 +155,8 @@ async def voice_ws(
 
         # Build Gemini Live URL
         live_model = getattr(settings, "GEMINI_LIVE_MODEL", "models/gemini-2.0-flash-live-001")
-      logger.info(f"Using Gemini Live model: {live_model}")
+        logger.info(f"Using Gemini Live model: {live_model}")
+      
         gemini_url = (
             f"wss://generativelanguage.googleapis.com/ws/"
             f"google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent"
