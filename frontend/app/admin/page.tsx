@@ -380,7 +380,7 @@ export default function AdminPage() {
               <Crown size={15} className="inline mr-1.5 text-brass-500" /> Manual Plan Override
             </h3>
             <p className="text-sm text-slate-500 mb-4">
-              Override a user's subscription plan directly. This is the manual method until a backend
+              Override a user&apos;s subscription plan directly. This is the manual method until a backend
               `/admin/users/&lt;id&gt;/set-plan` endpoint is added. You can also do this directly in the
               <strong> Supabase Table Editor → users table → subscription_plan column.</strong>
             </p>
