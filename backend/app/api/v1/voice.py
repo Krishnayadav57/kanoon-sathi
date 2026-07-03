@@ -154,7 +154,7 @@ async def voice_ws(
         await _safe_send_json(websocket, {"type": "ready", "remaining_seconds": remaining})
 
         # Build Gemini Live URL
-        live_model = getattr(settings, "GEMINI_LIVE_MODEL", "models/gemini-live-2.5-flash-native-audio")
+        live_model = getattr(settings, "GEMINI_LIVE_MODEL", "models/gemini-2.0-flash-live-001")
         gemini_url = (
             f"wss://generativelanguage.googleapis.com/ws/"
             f"google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent"
