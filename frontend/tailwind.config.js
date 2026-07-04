@@ -1,4 +1,8 @@
 /** @type {import('tailwindcss').Config} */
+// PHASE 1 CHANGE: added `brand` color group (navy/gold premium palette) and a few
+// utility extensions used by the new Admin Panel + Law Library UI.
+// Nothing existing was removed — all prior colors (paper, ink, crimson, emerald,
+// brass, slate) are untouched, so existing pages keep rendering exactly as before.
 module.exports = {
   content: ["./app/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
@@ -37,6 +41,23 @@ module.exports = {
           600: "#4A4D53",
           700: "#34363A",
         },
+        // --- NEW: premium legal-tech "brand" palette (navy + gold) ---
+        // Used for the redesigned Admin Panel and new Law Library / Learning UI.
+        // Existing components using ink/crimson/etc. are unaffected.
+        brand: {
+          bg: "#F8FAFC",
+          card: "#FFFFFF",
+          border: "#E5E7EB",
+          navy: "#071B4D",
+          "navy-600": "#0D2E6E",
+          gold: "#C89B3C",
+          "gold-100": "#F3E7CB",
+          text: "#111827",
+          "text-secondary": "#6B7280",
+          success: "#10B981",
+          warning: "#F59E0B",
+          danger: "#EF4444",
+        },
       },
       fontFamily: {
         display: ["var(--font-display)", "system-ui", "sans-serif"],
@@ -45,11 +66,14 @@ module.exports = {
       },
       borderRadius: {
         seal: "999px",
+        brand: "1rem",
       },
       boxShadow: {
         soft: "0 1px 2px rgba(19, 21, 26, 0.04), 0 2px 12px rgba(19, 21, 26, 0.04)",
         lifted: "0 4px 16px rgba(19, 21, 26, 0.06), 0 12px 32px rgba(19, 21, 26, 0.08)",
         ring: "0 0 0 1px rgba(168, 35, 47, 0.12)",
+        // NEW: softer, cooler shadow used across the navy/gold admin + learning UI
+        brand: "0 1px 2px rgba(7, 27, 77, 0.04), 0 8px 24px rgba(7, 27, 77, 0.08)",
       },
       keyframes: {
         "fade-up": {

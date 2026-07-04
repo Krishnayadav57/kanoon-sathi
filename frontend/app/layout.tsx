@@ -1,12 +1,19 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Lexend, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-
 import { AuthProvider } from "@/lib/auth-context";
 import { LangProvider } from "@/lib/lang-context";
+import { AppShell } from "@/components/BrandShell";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+// PHASE 2 CHANGE: swapped the old <Navbar/> + <Footer/> pair for <AppShell>,
+// which renders the new navy/gold sidebar (desktop) + bottom tab bar (mobile)
+// from components/BrandShell.tsx. AuthProvider/LangProvider are untouched, so
+// every existing page (chat, dashboard, admin, etc.) keeps working exactly as
+// before — only the surrounding chrome changed.
+//
+// If you're not ready to switch every page over yet, you can instead keep the
+// original layout.tsx and only wrap specific pages (e.g. app/page.tsx) in
+// <AppShell> individually.
 
 const display = Lexend({
   subsets: ["latin"],
@@ -31,57 +38,15 @@ export const metadata: Metadata = {
   title: "Kanoon Mitra — Nepal Legal Awareness Platform",
   description:
     "Understand Nepal's laws in plain Nepali or English. Kanoon Mitra explains your legal situation, helps you draft complaints, and points you to the right office. General legal information only — not a substitute for a licensed lawyer.",
-
-  manifest: "/manifest.json",
-
-  applicationName: "Kanoon Mitra",
-
-  icons: {
-    icon: [
-      {
-        url: "/icons/icon-192.png",
-        sizes: "192x192",
-        type: "image/png",
-      },
-      {
-        url: "/icons/icon-512.png",
-        sizes: "512x512",
-        type: "image/png",
-      },
-    ],
-    apple: "/icons/icon-192.png",
-  },
-
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Kanoon Mitra",
-  },
 };
 
-export const viewport: Viewport = {
-  themeColor: "#0B1F4D",
-  width: "device-width",
-  initialScale: 1,
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ne">
-      <body
-        className={`${display.variable} ${inter.variable} ${jbmono.variable} font-body antialiased bg-paper text-ink`}
-      >
+      <body className={`${display.variable} ${inter.variable} ${jbmono.variable} font-body antialiased bg-brand-bg text-brand-text`}>
         <LangProvider>
           <AuthProvider>
-            <div className="flex min-h-screen flex-col">
-              <Navbar />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
+            <AppShell>{children}</AppShell>
           </AuthProvider>
         </LangProvider>
       </body>

@@ -1,12 +1,13 @@
 "use client";
+// PHASE 3: restyled to brand.* tokens. Stripe/eSewa/Khalti logic, state, and
+// API calls are unchanged from the original pricing page.
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, CreditCard, Smartphone, Upload, Crown, Loader2 } from "lucide-react";
+import { Check, CreditCard, Smartphone, Upload, Crown } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useLang } from "@/lib/lang-context";
 import { api, getApiErrorMessage } from "@/lib/api";
-import { Button, Card, Input, Alert } from "@/components/ui";
 
 type ManualInstructions = {
   esewa: { number: string; name: string; amount_npr: number };
@@ -85,164 +86,175 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8">
-      <div className="animate-fade-up text-center">
-        <span className="text-xs font-bold uppercase tracking-wider text-crimson-500">
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-10">
+      <div className="text-center">
+        <span className="text-xs font-bold uppercase tracking-wider text-brand-gold">
           {lang === "ne" ? "मूल्य" : "Pricing"}
         </span>
-        <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-brand-navy sm:text-4xl">
           {lang === "ne" ? "सरल, पारदर्शी मूल्य" : "Simple, transparent pricing"}
         </h1>
-        <p className="mt-3 text-slate-500">
+        <p className="mt-3 text-brand-text-secondary">
           {lang === "ne" ? "जुनसुकै बेला अपग्रेड वा रद्द गर्नुहोस्।" : "Upgrade or cancel anytime."}
         </p>
       </div>
 
       <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
-        {/* Free */}
-        <Card className="animate-fade-up [animation-delay:100ms]">
-          <p className="font-display text-sm font-semibold uppercase tracking-wide text-slate-400">{t("pricing_free")}</p>
-          <p className="mt-1 text-sm text-slate-500">{t("pricing_free_desc")}</p>
-          <p className="mt-4 font-display text-4xl font-semibold text-ink">
-            NPR 0 <span className="text-sm font-normal text-slate-400">{t("pricing_per_month")}</span>
+        <div className="rounded-2xl border border-brand-border bg-brand-card p-6 shadow-brand">
+          <p className="font-display text-sm font-semibold uppercase tracking-wide text-brand-text-secondary">{t("pricing_free")}</p>
+          <p className="mt-1 text-sm text-brand-text-secondary">{t("pricing_free_desc")}</p>
+          <p className="mt-4 font-display text-4xl font-bold text-brand-text">
+            NPR 0 <span className="text-sm font-normal text-brand-text-secondary">{t("pricing_per_month")}</span>
           </p>
           <ul className="mt-6 space-y-3">
             {freeFeatures.map(f => (
-              <li key={f} className="flex items-center gap-2 text-sm text-slate-600">
-                <Check size={16} className="shrink-0 text-slate-400" /> {f}
+              <li key={f} className="flex items-center gap-2 text-sm text-brand-text-secondary">
+                <Check size={16} className="shrink-0 text-brand-text-secondary" /> {f}
               </li>
             ))}
           </ul>
-        </Card>
+        </div>
 
-        {/* Premium */}
-        <Card className="animate-fade-up [animation-delay:180ms] relative overflow-hidden border-2 border-ink">
-          <div className="absolute right-0 top-0 rounded-bl-2xl bg-ink px-4 py-1.5">
-            <span className="flex items-center gap-1 text-xs font-bold text-paper">
-              <Crown size={11} className="text-brass-400" />
+        <div className="relative overflow-hidden rounded-2xl border-2 border-brand-navy bg-brand-card p-6 shadow-brand">
+          <div className="absolute right-0 top-0 rounded-bl-2xl bg-brand-navy px-4 py-1.5">
+            <span className="flex items-center gap-1 text-xs font-bold text-white">
+              <Crown size={11} className="text-brand-gold" />
               {lang === "ne" ? "सर्वोत्तम" : "Best value"}
             </span>
           </div>
-          <p className="font-display text-sm font-semibold uppercase tracking-wide text-crimson-500">{t("pricing_premium")}</p>
-          <p className="mt-1 text-sm text-slate-500">{t("pricing_premium_desc")}</p>
-          <p className="mt-4 font-display text-4xl font-semibold text-ink">
-            NPR {price} <span className="text-sm font-normal text-slate-400">{t("pricing_per_month")}</span>
+          <p className="font-display text-sm font-semibold uppercase tracking-wide text-brand-gold">{t("pricing_premium")}</p>
+          <p className="mt-1 text-sm text-brand-text-secondary">{t("pricing_premium_desc")}</p>
+          <p className="mt-4 font-display text-4xl font-bold text-brand-text">
+            NPR {price} <span className="text-sm font-normal text-brand-text-secondary">{t("pricing_per_month")}</span>
           </p>
           <ul className="mt-6 space-y-3">
             {premiumFeatures.map(f => (
-              <li key={f} className="flex items-center gap-2 text-sm text-slate-600">
-                <Check size={16} className="shrink-0 text-crimson-500" /> {f}
+              <li key={f} className="flex items-center gap-2 text-sm text-brand-text-secondary">
+                <Check size={16} className="shrink-0 text-brand-navy" /> {f}
               </li>
             ))}
           </ul>
-        </Card>
+        </div>
       </div>
 
       {message && (
         <div className="mx-auto mt-8 max-w-xl">
-          <Alert variant={message.type === "success" ? "success" : "error"}>{message.text}</Alert>
+          <div className={`rounded-xl border px-4 py-3 text-sm ${message.type === "success" ? "border-emerald-100 bg-emerald-50 text-emerald-600" : "border-red-100 bg-red-50 text-brand-danger"}`}>
+            {message.text}
+          </div>
         </div>
       )}
 
-      <div className="mx-auto mt-12 max-w-xl animate-fade-up [animation-delay:260ms]">
-        <h2 className="mb-6 text-center font-display text-lg font-semibold text-ink">{t("pay_with")}</h2>
+      <div className="mx-auto mt-12 max-w-xl">
+        <h2 className="mb-6 text-center font-display text-lg font-semibold text-brand-text">{t("pay_with")}</h2>
 
         <div className="space-y-4">
-          {/* Stripe */}
-          <Card className="flex items-center justify-between">
+          <div className="flex items-center justify-between rounded-2xl border border-brand-border bg-brand-card p-5 shadow-brand">
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-ink text-paper shadow-soft">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-navy text-white shadow-brand">
                 <CreditCard size={18} />
               </span>
               <div>
-                <p className="font-medium text-ink">{lang === "ne" ? "कार्ड (अन्तर्राष्ट्रिय)" : "Card (International)"}</p>
-                <p className="text-xs text-slate-400">Visa, Mastercard via Stripe</p>
+                <p className="font-medium text-brand-text">{lang === "ne" ? "कार्ड (अन्तर्राष्ट्रिय)" : "Card (International)"}</p>
+                <p className="text-xs text-brand-text-secondary">Visa, Mastercard via Stripe</p>
               </div>
             </div>
-            <Button onClick={handleStripe} loading={stripeLoading} size="sm">{t("pricing_subscribe")}</Button>
-          </Card>
+            <button onClick={handleStripe} disabled={stripeLoading} className="rounded-xl bg-brand-navy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+              {stripeLoading ? "…" : t("pricing_subscribe")}
+            </button>
+          </div>
 
-          {/* eSewa */}
-          <Card>
+          <div className="rounded-2xl border border-brand-border bg-brand-card p-5 shadow-brand">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-paper shadow-soft">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-brand">
                   <Smartphone size={18} />
                 </span>
                 <div>
-                  <p className="font-medium text-ink">eSewa</p>
-                  <p className="text-xs text-slate-400">{lang === "ne" ? "सिधा भुक्तानी" : "Direct payment"}</p>
+                  <p className="font-medium text-brand-text">eSewa</p>
+                  <p className="text-xs text-brand-text-secondary">{lang === "ne" ? "सिधा भुक्तानी" : "Direct payment"}</p>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => { if (!user) return requireLogin(); setActiveProvider(activeProvider === "esewa" ? null : "esewa"); }}>
+              <button
+                onClick={() => { if (!user) return requireLogin(); setActiveProvider(activeProvider === "esewa" ? null : "esewa"); }}
+                className="rounded-xl border border-brand-border px-4 py-2 text-sm font-semibold text-brand-navy hover:border-brand-navy"
+              >
                 {activeProvider === "esewa" ? (lang === "ne" ? "बन्द" : "Close") : (lang === "ne" ? "तिर्नुहोस्" : "Pay")}
-              </Button>
+              </button>
             </div>
             {activeProvider === "esewa" && instructions && (
-              <ManualPayForm provider="esewa" receiverNumber={instructions.esewa.number} receiverName={instructions.esewa.name}
+              <ManualPayForm receiverNumber={instructions.esewa.number} receiverName={instructions.esewa.name}
                 amount={instructions.esewa.amount_npr} reference={reference} setReference={setReference}
                 screenshot={screenshot} setScreenshot={setScreenshot} submitting={submitting} onSubmit={handleManualSubmit} lang={lang} />
             )}
-          </Card>
+          </div>
 
-          {/* Khalti */}
-          <Card>
+          <div className="rounded-2xl border border-brand-border bg-brand-card p-5 shadow-brand">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-crimson-500 text-paper shadow-soft">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-danger text-white shadow-brand">
                   <Smartphone size={18} />
                 </span>
                 <div>
-                  <p className="font-medium text-ink">Khalti</p>
-                  <p className="text-xs text-slate-400">{lang === "ne" ? "सिधा भुक्तानी" : "Direct payment"}</p>
+                  <p className="font-medium text-brand-text">Khalti</p>
+                  <p className="text-xs text-brand-text-secondary">{lang === "ne" ? "सिधा भुक्तानी" : "Direct payment"}</p>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => { if (!user) return requireLogin(); setActiveProvider(activeProvider === "khalti" ? null : "khalti"); }}>
+              <button
+                onClick={() => { if (!user) return requireLogin(); setActiveProvider(activeProvider === "khalti" ? null : "khalti"); }}
+                className="rounded-xl border border-brand-border px-4 py-2 text-sm font-semibold text-brand-navy hover:border-brand-navy"
+              >
                 {activeProvider === "khalti" ? (lang === "ne" ? "बन्द" : "Close") : (lang === "ne" ? "तिर्नुहोस्" : "Pay")}
-              </Button>
+              </button>
             </div>
             {activeProvider === "khalti" && instructions && (
-              <ManualPayForm provider="khalti" receiverNumber={instructions.khalti.number} receiverName={instructions.khalti.name}
+              <ManualPayForm receiverNumber={instructions.khalti.number} receiverName={instructions.khalti.name}
                 amount={instructions.khalti.amount_npr} reference={reference} setReference={setReference}
                 screenshot={screenshot} setScreenshot={setScreenshot} submitting={submitting} onSubmit={handleManualSubmit} lang={lang} />
             )}
-          </Card>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function ManualPayForm({ provider, receiverNumber, receiverName, amount, reference, setReference, screenshot, setScreenshot, submitting, onSubmit, lang }: any) {
+function ManualPayForm({ receiverNumber, receiverName, amount, reference, setReference, screenshot, setScreenshot, submitting, onSubmit, lang }: any) {
   return (
-    <div className="mt-4 border-t border-slate-100 pt-4">
-      <div className="rounded-2xl bg-slate-50 p-4 text-sm">
-        <p className="text-xs font-medium text-slate-500 mb-2">{lang === "ne" ? "यो नम्बरमा पठाउनुहोस्:" : "Send payment to:"}</p>
-        <p className="font-mono text-lg font-bold text-ink">{receiverNumber || "—"}</p>
-        <p className="text-xs text-slate-500">{receiverName}</p>
-        <p className="mt-2 text-xs text-slate-500">
-          {lang === "ne" ? "रकम:" : "Amount:"}{" "}
-          <span className="font-bold text-ink">NPR {amount}</span>
+    <div className="mt-4 border-t border-brand-border pt-4">
+      <div className="rounded-xl bg-brand-bg p-4 text-sm">
+        <p className="text-xs font-medium text-brand-text-secondary mb-2">{lang === "ne" ? "यो नम्बरमा पठाउनुहोस्:" : "Send payment to:"}</p>
+        <p className="font-mono text-lg font-bold text-brand-text">{receiverNumber || "—"}</p>
+        <p className="text-xs text-brand-text-secondary">{receiverName}</p>
+        <p className="mt-2 text-xs text-brand-text-secondary">
+          {lang === "ne" ? "रकम:" : "Amount:"} <span className="font-bold text-brand-text">NPR {amount}</span>
         </p>
       </div>
       <form onSubmit={onSubmit} className="mt-4 space-y-3">
-        <Input label={lang === "ne" ? "कारोबार ID / सन्दर्भ नम्बर" : "Transaction ID / Reference"}
-          required value={reference} onChange={(e: any) => setReference(e.target.value)}
-          placeholder={lang === "ne" ? "भुक्तानी एपको कारोबार ID" : "From your payment app receipt"} />
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-600">
+          <label className="mb-1.5 block text-sm font-medium text-brand-text-secondary">
+            {lang === "ne" ? "कारोबार ID / सन्दर्भ नम्बर" : "Transaction ID / Reference"}
+          </label>
+          <input
+            required value={reference} onChange={(e: any) => setReference(e.target.value)}
+            placeholder={lang === "ne" ? "भुक्तानी एपको कारोबार ID" : "From your payment app receipt"}
+            className="w-full rounded-xl border border-brand-border bg-white px-4 py-2.5 text-sm text-brand-text placeholder:text-brand-text-secondary focus:border-brand-navy focus:outline-none"
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-brand-text-secondary">
             {lang === "ne" ? "स्क्रिनशट अपलोड" : "Upload screenshot"}
           </label>
-          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-6 text-sm text-slate-400 hover:border-ink hover:text-ink transition-all">
+          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-brand-border py-6 text-sm text-brand-text-secondary hover:border-brand-navy transition-all">
             <Upload size={18} />
             {screenshot ? screenshot.name : lang === "ne" ? "फाइल छान्नुहोस्" : "Choose file"}
             <input type="file" accept="image/*" className="hidden" onChange={(e: any) => setScreenshot(e.target.files?.[0] ?? null)} required />
           </label>
         </div>
-        <Button type="submit" className="w-full" loading={submitting} disabled={!reference.trim() || !screenshot}>
-          {lang === "ne" ? "प्रमाण पठाउनुहोस्" : "Submit proof of payment"}
-        </Button>
-        <p className="text-center text-xs text-slate-400">
+        <button type="submit" disabled={submitting || !reference.trim() || !screenshot} className="w-full rounded-xl bg-brand-navy py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+          {submitting ? "…" : (lang === "ne" ? "प्रमाण पठाउनुहोस्" : "Submit proof of payment")}
+        </button>
+        <p className="text-center text-xs text-brand-text-secondary">
           {lang === "ne" ? "सामान्यतया २४ घण्टाभित्र जाँच गरिनेछ" : "Usually reviewed within 24 hours"}
         </p>
       </form>

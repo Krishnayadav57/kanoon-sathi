@@ -11,6 +11,9 @@ import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
 import { Button, Card, Alert, Input, Select } from "@/components/ui";
 
+import { AdminShell } from "@/components/AdminSidebar";
+import { StatCard, PanelCard, QuickActionButton } from "@/components/AdminWidgets";
+
 type Revenue = {
   total_revenue_npr: number; revenue_last_30_days_npr: number;
   total_users: number; total_premium_users: number;
@@ -135,6 +138,7 @@ export default function AdminPage() {
   ];
 
   return (
+  <AdminShell>
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
@@ -507,8 +511,9 @@ export default function AdminPage() {
             </div>
           </Card>
         </div>
-      )}
+            )}
     </div>
+  </AdminShell>
   );
 }
 

@@ -11,7 +11,25 @@ from app.models import *  # noqa: F401,F403 - ensures all models are registered 
 from app.models.user import User  # noqa: F401
 from app.models.payment import Payment  # noqa: F401
 from app.models.knowledge_base import LegalArticle, LegalCategory  # noqa: F401
-from app.models.extras import LawyerProfile, OfficeLocation, Quiz, VoiceUsage, ComplianceReminder  # noqa: F401
+from app.models.extras import (
+    LawyerProfile,
+    OfficeLocation,
+    Quiz,
+    VoiceUsage,
+    ComplianceReminder,
+)  # noqa: F401
+
+# Added for Law Library models
+from app.models.law_library import (
+    Law,
+    LawChapter,
+    LawSection,
+    LawBookmark,
+    LawNote,
+    UserLearningProfile,
+    StudyStreakLog,
+    UserSectionProgress,
+)  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
@@ -24,15 +42,30 @@ target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url, target_metadata=target_metadata, literal_binds=True, dialect_opts={"paramstyle": "named"})
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
     with context.begin_transaction():
         context.run_migrations()
 
 
 def run_migrations_online() -> None:
-    connectable = engine_from_config(config.get_section(config.config_ini_section, {}), prefix="sqlalchemy.", poolclass=pool.NullPool)
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+        )
+
         with context.begin_transaction():
             context.run_migrations()
 

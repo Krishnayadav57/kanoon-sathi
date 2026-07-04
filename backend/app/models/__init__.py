@@ -19,6 +19,19 @@ from app.models.extras import (
     ScamCheck,
 )
 from app.models.knowledge_base import LegalArticle, LegalCategory, LegalNewsUpdate
+
+# ADD THIS
+from app.models.law_library import (
+    Law,
+    LawChapter,
+    LawSection,
+    LawBookmark,
+    LawNote,
+    UserLearningProfile,
+    StudyStreakLog,
+    UserSectionProgress,
+)
+
 from app.models.payment import Payment, PaymentProvider, PaymentStatus
 from app.models.user import AccessibilityMode, SubscriptionPlan, User, UserRole
 
@@ -50,4 +63,14 @@ __all__ = [
     "ComplianceReminder",
     "ScamCheck",
     "VoiceUsage",
+
+    # ADD THESE
+    "Law",
+    "LawChapter",
+    "LawSection",
+    "LawBookmark",
+    "LawNote",
+    "UserLearningProfile",
+    "StudyStreakLog",
+    "UserSectionProgress",
 ]
